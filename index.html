@@ -11,7 +11,6 @@
       padding: 0;
       font-family: Arial, sans-serif;
 
-      /* FIX PARA QUE NO SE CORTE */
       overflow-x: hidden;
       overflow-y: auto;
 
@@ -67,6 +66,7 @@
       cursor: pointer;
       font-weight: bold;
       transition: transform 0.2s ease;
+      z-index: 999;
     }
 
     button:hover {
@@ -84,6 +84,7 @@
       color: white;
       box-shadow: 0px 0px 25px rgba(255, 0, 0, 0.7);
       position: relative;
+      z-index: 9999;
     }
 
     /* Corazones flotando */
@@ -113,6 +114,19 @@
     @keyframes pop {
       from { transform: scale(1); }
       to { transform: scale(1.15); }
+    }
+
+    #finalText {
+      display: none;
+      font-size: 1.6rem;
+      margin-top: 15px;
+      text-shadow: 0px 0px 15px rgba(0,0,0,0.5);
+      animation: fadeIn 1.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     /* Caritas enojadas */
@@ -261,6 +275,7 @@
     </div>
 
     <div id="loveMessage">💖 TE AMO 💖</div>
+    <div id="finalText">💘 Prometo cuidarte, hacerte reír y darte amor siempre 💘</div>
 
     <div id="countdownBox">
       <div class="mysteryBg"></div>
@@ -269,12 +284,20 @@
     </div>
   </div>
 
+  <!-- Música (puedes cambiar el link por otra canción) -->
+  <audio id="music" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
+
   <script>
     const noBtn = document.getElementById("noBtn");
     const yesBtn = document.getElementById("yesBtn");
     const loveMessage = document.getElementById("loveMessage");
+    const finalText = document.getElementById("finalText");
     const countdownBox = document.getElementById("countdownBox");
     const countdownText = document.getElementById("countdown");
+    const music = document.getElementById("music");
+
+    let yesScale = 1;
+    let alreadyClickedYes = false;
 
     // Corazones flotando
     function createHeart() {
@@ -304,7 +327,7 @@
       setTimeout(() => face.remove(), 1500);
     }
 
-    // FIX: Botón NO siempre dentro de la pantalla
+    // Botón NO siempre dentro de la pantalla
     function moveNoButton() {
       const maxX = window.innerWidth - noBtn.offsetWidth - 50;
       const maxY = window.innerHeight - noBtn.offsetHeight - 50;
@@ -318,11 +341,17 @@
     }
 
     noBtn.addEventListener("click", () => {
+      if (alreadyClickedYes) return;
+
       moveNoButton();
       angryFaces();
+
+      // Crece el botón SÍ cada vez que le da NO 😈
+      yesScale += 0.08;
+      yesBtn.style.transform = `scale(${yesScale})`;
     });
 
-    // Confeti (REDUCIDO)
+    // Confeti reducido
     function createConfetti() {
       for (let i = 0; i < 80; i++) {
         const confetti = document.createElement("div");
@@ -340,7 +369,7 @@
       }
     }
 
-    // Fuegos artificiales brutales
+    // Fuegos artificiales
     function fireworks() {
       for (let i = 0; i < 30; i++) {
         const firework = document.createElement("div");
@@ -358,7 +387,7 @@
 
     // Texto explosivo TE AMO
     function fireLoveText() {
-      const texts = ["🔥 TE AMO 🔥", "💖 ERES MI TODO 💖", "💘 MI VALENTÍN 💘"];
+      const texts = ["🔥 TE AMO 🔥", "💖 ERES MI TODO 💖", "💘 MI VALENTÍN 💘", "💞 SOLO TÚ 💞"];
       const fireText = document.createElement("div");
       fireText.classList.add("fireText");
       fireText.innerHTML = texts[Math.floor(Math.random() * texts.length)];
@@ -406,8 +435,7 @@
         const minutes = Math.floor((diff / (1000 * 60)) % 60);
         const seconds = Math.floor((diff / 1000) % 60);
 
-        countdownText.innerHTML =
-          `⏳ ${days}D : ${hours}H : ${minutes}M : ${seconds}S`;
+        countdownText.innerHTML = `⏳ ${days}D : ${hours}H : ${minutes}M : ${seconds}S`;
       }
 
       updateCountdown();
@@ -416,24 +444,39 @@
 
     // Evento botón SÍ
     yesBtn.addEventListener("click", () => {
+      if (alreadyClickedYes) return;
+      alreadyClickedYes = true;
+
       loveMessage.style.display = "block";
+      finalText.style.display = "block";
       countdownBox.style.display = "block";
 
+      // Desactivar botón NO
+      noBtn.disabled = true;
+      noBtn.style.opacity = "0.4";
+      noBtn.style.cursor = "not-allowed";
+
+      // Fondo más intenso
       document.body.style.background = "radial-gradient(circle, #ff004c, #ff85a1, #ffd6e0)";
+
+      // Música
+      music.volume = 0.4;
+      music.play();
 
       startCountdown();
 
       createConfetti();
       fireworks();
+      fireLoveText();
 
-      // Intervalos más suaves (menos lag)
+      // Intervalos suaves (menos lag)
       setInterval(createConfetti, 2500);
       setInterval(fireworks, 1200);
       setInterval(fireLoveText, 1500);
       setInterval(createQuestionMarks, 600);
     });
-
   </script>
 
 </body>
 </html>
+
